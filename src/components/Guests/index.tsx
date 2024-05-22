@@ -1,15 +1,28 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import { props } from "../../types/Guests";
+import { GuestProps } from "../../types/Guests";
 import { styles } from "./styles";
 
-export const Guests = ({ name, onRemove, onCheck, active }: props) => {
+export const Guests: React.FC<GuestProps> = ({
+  name,
+  onRemove,
+  onCheck,
+  checkedGuests,
+}) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.checkButton} onPress={onCheck}>
-        <Text style={styles.checkButtonText}>{active ? "X" : "✓"}</Text>
+        <Text style={styles.checkButtonText}>
+          {checkedGuests.includes(name) ? "X" : "✓"}
+        </Text>
       </TouchableOpacity>
 
-      <Text style={active ? styles.checkedText : styles.uncheckedText}>
+      <Text
+        style={
+          checkedGuests.includes(name)
+            ? styles.checkedText
+            : styles.uncheckedText
+        }
+      >
         {name}
       </Text>
 

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "here",
+    "name": "Here",
     "slug": "here",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,10 +18,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.leodeutsch.here"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e5b5af3d-d73e-4644-95bb-fb7319751077"
+      }
     }
   }
 }

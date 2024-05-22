@@ -1,6 +1,6 @@
-export type props = {
+export type GuestProps = {
   name: String;
   onRemove: () => void;
-  active: boolean;
+  checkedGuests: String[];
   onCheck: () => void;
 };

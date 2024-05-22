@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#131016",
     padding: 24,
   },
   eventName: {
@@ -19,7 +18,6 @@ export const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 56,
-    // backgroundColor: "#1F1E25",
     backgroundColor: "#6b6b6b",
     borderRadius: 5,
     color: "#FFF",
@@ -59,7 +57,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     marginTop: 40,
-    marginBottom: 30,
+    marginBottom: 15,
   },
   list: {
     marginTop: 50,
@@ -69,5 +67,37 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: "center",
     marginTop: 50,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    alignItems: "center",
+    padding: 10,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: "#35716a",
   },
 });
