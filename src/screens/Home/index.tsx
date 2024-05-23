@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { styles } from "./styles";
+import { createStyle } from "./styles";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Guests } from "../../components/Guests";
+import { ThemeContext } from "../../context/Theme";
 
 export const Home = () => {
   const [guests, setGuests] = useState<string[]>([]);
@@ -19,6 +20,9 @@ export const Home = () => {
   const [guestName, setGuestName] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [guestToRemove, setGuestToRemove] = useState<string | null>(null);
+
+  const { theme } = useContext(ThemeContext);
+  const styles = createStyle(theme);
 
   useEffect(() => {
     const loadGuests = async () => {
@@ -134,7 +138,7 @@ export const Home = () => {
         <TextInput
           style={styles.input}
           placeholder="Nome do convidado"
-          placeholderTextColor="#959494"
+          placeholderTextColor={theme === "dark" ? "#333333" : "#959494"}
           onChangeText={setGuestName}
           value={guestName}
         />
