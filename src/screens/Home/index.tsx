@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -7,17 +7,17 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
-import { createStyle } from "./styles";
+} from 'react-native';
+import { createStyle } from './styles';
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Guests } from "../../components/Guests";
-import { ThemeContext } from "../../context/Theme";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Guests } from '../../components/Guests';
+import { ThemeContext } from '../../context/Theme';
 
 export const Home = () => {
   const [guests, setGuests] = useState<string[]>([]);
   const [checkedGuests, setCheckedGuests] = useState<string[]>([]);
-  const [guestName, setGuestName] = useState("");
+  const [guestName, setGuestName] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [guestToRemove, setGuestToRemove] = useState<string | null>(null);
 
@@ -27,8 +27,8 @@ export const Home = () => {
   useEffect(() => {
     const loadGuests = async () => {
       try {
-        const savedGuests = await AsyncStorage.getItem("@guests");
-        const savedCheckedGuests = await AsyncStorage.getItem("@checkedGuests");
+        const savedGuests = await AsyncStorage.getItem('@guests');
+        const savedCheckedGuests = await AsyncStorage.getItem('@checkedGuests');
         if (savedGuests) {
           setGuests(JSON.parse(savedGuests));
         }
@@ -36,7 +36,7 @@ export const Home = () => {
           setCheckedGuests(JSON.parse(savedCheckedGuests));
         }
       } catch (error) {
-        console.error("Failed to load guests from storage", error);
+        console.error('Failed to load guests from storage', error);
       }
     };
 
@@ -46,13 +46,13 @@ export const Home = () => {
   useEffect(() => {
     const saveGuests = async () => {
       try {
-        await AsyncStorage.setItem("@guests", JSON.stringify(guests));
+        await AsyncStorage.setItem('@guests', JSON.stringify(guests));
         await AsyncStorage.setItem(
-          "@checkedGuests",
-          JSON.stringify(checkedGuests)
+          '@checkedGuests',
+          JSON.stringify(checkedGuests),
         );
       } catch (error) {
-        console.error("Failed to save guests to storage", error);
+        console.error('Failed to save guests to storage', error);
       }
     };
 
@@ -60,25 +60,25 @@ export const Home = () => {
   }, [guests, checkedGuests]);
 
   const handleGuest = () => {
-    if (guestName === "") {
-      return Alert.alert("Sem nome", "Por favor insira um nome.");
+    if (guestName === '') {
+      return Alert.alert('Sem nome', 'Por favor insira um nome.');
     }
 
     if (guests.includes(guestName)) {
       return Alert.alert(
-        "Convidado existe",
-        "O convidado já foi adicionado na lista."
+        'Convidado existe',
+        'O convidado já foi adicionado na lista.',
       );
     }
 
     setGuests((prevState) => [...prevState, guestName]);
-    setGuestName("");
+    setGuestName('');
   };
 
   const handleCheck = (name: string) => {
     if (checkedGuests.includes(name)) {
       setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== name)
+        prevState.filter((guest) => guest !== name),
       );
     } else {
       setCheckedGuests((prevState) => [...prevState, name]);
@@ -93,10 +93,10 @@ export const Home = () => {
   const handleDeleteGuest = () => {
     if (guestToRemove) {
       setGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove)
+        prevState.filter((guest) => guest !== guestToRemove),
       );
       setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove)
+        prevState.filter((guest) => guest !== guestToRemove),
       );
     }
     setModalVisible(false);
@@ -138,7 +138,7 @@ export const Home = () => {
         <TextInput
           style={styles.input}
           placeholder="Nome do convidado"
-          placeholderTextColor={theme === "dark" ? "#333333" : "#959494"}
+          placeholderTextColor={theme === 'dark' ? '#333333' : '#959494'}
           onChangeText={setGuestName}
           value={guestName}
         />
