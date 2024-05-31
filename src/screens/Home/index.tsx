@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Alert,
   FlatList,
@@ -7,106 +7,115 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { createStyle } from './styles';
+} from 'react-native'
+import { createStyle } from './styles'
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Guests } from '../../components/Guests';
-import { ThemeContext } from '../../context/Theme';
+import { Guests } from '../../components/Guests'
+import { ThemeContext } from '../../context/Theme'
+import { addGuest, deleteGuest, getGuests, updateGuest } from '../../service'
+import { GuestRes } from '../../types/Guests'
 
 export const Home = () => {
-  const [guests, setGuests] = useState<string[]>([]);
-  const [checkedGuests, setCheckedGuests] = useState<string[]>([]);
-  const [guestName, setGuestName] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [guestToRemove, setGuestToRemove] = useState<string | null>(null);
+  const [guests, setGuests] = useState<GuestRes[]>([])
+  const [guestName, setGuestName] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+  const [guestToRemove, setGuestToRemove] = useState<GuestRes | null>(null)
 
-  const { theme } = useContext(ThemeContext);
-  const styles = createStyle(theme);
+  const { theme } = useContext(ThemeContext)
+  const styles = createStyle(theme)
 
   useEffect(() => {
     const loadGuests = async () => {
       try {
-        const savedGuests = await AsyncStorage.getItem('@guests');
-        const savedCheckedGuests = await AsyncStorage.getItem('@checkedGuests');
+        const savedGuests = await getGuests()
         if (savedGuests) {
-          setGuests(JSON.parse(savedGuests));
+          setGuests(savedGuests.data)
         }
-        if (savedCheckedGuests) {
-          setCheckedGuests(JSON.parse(savedCheckedGuests));
-        }
-      } catch (error) {
-        console.error('Failed to load guests from storage', error);
+      } catch (error: any) {
+        console.error('Failed to load guests from api', error)
       }
-    };
+    }
 
-    loadGuests();
-  }, []);
+    loadGuests()
+  }, [guests])
 
-  useEffect(() => {
-    const saveGuests = async () => {
-      try {
-        await AsyncStorage.setItem('@guests', JSON.stringify(guests));
-        await AsyncStorage.setItem(
-          '@checkedGuests',
-          JSON.stringify(checkedGuests),
-        );
-      } catch (error) {
-        console.error('Failed to save guests to storage', error);
-      }
-    };
-
-    saveGuests();
-  }, [guests, checkedGuests]);
-
-  const handleGuest = () => {
+  const handleGuest = async () => {
     if (guestName === '') {
-      return Alert.alert('Sem nome', 'Por favor insira um nome.');
+      return Alert.alert('Sem nome', 'Por favor insira um nome.')
     }
 
-    if (guests.includes(guestName)) {
-      return Alert.alert(
-        'Convidado existe',
-        'O convidado já foi adicionado na lista.',
-      );
+    if (guests.length > 0) {
+      if (guests.some((g) => g?.name === guestName)) {
+        return Alert.alert(
+          'Convidado existe',
+          'O convidado já foi adicionado na lista.',
+        )
+      }
     }
 
-    setGuests((prevState) => [...prevState, guestName]);
-    setGuestName('');
-  };
+    try {
+      const guest = {
+        name: guestName,
+        enabled: false,
+      }
 
-  const handleCheck = (name: string) => {
-    if (checkedGuests.includes(name)) {
-      setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== name),
-      );
-    } else {
-      setCheckedGuests((prevState) => [...prevState, name]);
+      const response = await addGuest(guest)
+      console.warn(response)
+      if (response && response.data && !response.data.error) {
+        setGuests((prevState) => [...prevState, response.data])
+      } else {
+        throw new Error('Response does not contain expected data')
+      }
+
+      setGuestName('')
+    } catch (error) {
+      console.error('Error adding guest:', error)
+      Alert.alert('Erro', 'Ocorreu um erro ao adicionar o convidado.')
     }
-  };
+  }
 
-  const confirmDeleteGuest = (name: string) => {
-    setGuestToRemove(name);
-    setModalVisible(true);
-  };
+  const handleCheck = async (guest: GuestRes) => {
+    const updatedGuest = { ...guest, checked: !guest.enabled }
 
-  const handleDeleteGuest = () => {
-    if (guestToRemove) {
-      setGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove),
-      );
-      setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove),
-      );
+    try {
+      await updateGuest(updatedGuest)
+
+      setGuests((prevGuests) =>
+        prevGuests.map((g) => (g.id === guest.id ? updatedGuest : g)),
+      )
+    } catch (error) {
+      console.error('Error editing guest:', error)
+      Alert.alert('Erro', 'Ocorreu um erro ao atualizar o convidado.')
     }
-    setModalVisible(false);
-    setGuestToRemove(null);
-  };
+  }
+
+  const confirmDeleteGuest = (guest: GuestRes) => {
+    setGuestToRemove(guest)
+    setModalVisible(true)
+  }
+
+  const handleDeleteGuest = async () => {
+    try {
+      if (guestToRemove) {
+        await deleteGuest(guestToRemove.id)
+
+        setGuests((prevState) =>
+          prevState.filter((guest) => guest.id !== guestToRemove.id),
+        )
+      }
+
+      setModalVisible(false)
+      setGuestToRemove(null)
+    } catch (error) {
+      console.error('Error removing guest:', error)
+      Alert.alert('Erro', 'Ocorreu um erro ao remover o convidado.')
+    }
+  }
 
   const handleCancel = () => {
-    setModalVisible(false);
-    setGuestToRemove(null);
-  };
+    setModalVisible(false)
+    setGuestToRemove(null)
+  }
 
   return (
     <View style={styles.container}>
@@ -117,11 +126,10 @@ export const Home = () => {
       <FlatList
         style={styles.list}
         data={guests}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Guests
-            name={item}
-            checkedGuests={checkedGuests}
+            guest={item}
             onCheck={() => handleCheck(item)}
             onRemove={() => confirmDeleteGuest(item)}
           />
@@ -143,7 +151,10 @@ export const Home = () => {
           value={guestName}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleGuest}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleGuest}
+        >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -156,7 +167,7 @@ export const Home = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalText}>
-              Tem certeza que quer remover o convidado {guestToRemove}?
+              Tem certeza que quer remover o convidado {guestToRemove?.name}?
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -176,5 +187,5 @@ export const Home = () => {
         </View>
       </Modal>
     </View>
-  );
-};
+  )
+}

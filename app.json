@@ -27,6 +27,9 @@
     "extra": {
       "eas": {
         "projectId": "e5b5af3d-d73e-4644-95bb-fb7319751077"
+      },
+      "expo": {
+        "scheme": "myapp"
       }
     }
   }
