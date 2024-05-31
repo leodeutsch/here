@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Alert,
   FlatList,
@@ -7,106 +7,102 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { createStyle } from './styles';
+} from 'react-native'
+import { createStyle } from './styles'
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Guests } from '../../components/Guests';
-import { ThemeContext } from '../../context/Theme';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Guests } from '../../components/Guests'
+import { ThemeContext } from '../../context/Theme'
+import { GuestRes } from '../../types/Guests'
 
 export const Home = () => {
-  const [guests, setGuests] = useState<string[]>([]);
-  const [checkedGuests, setCheckedGuests] = useState<string[]>([]);
-  const [guestName, setGuestName] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [guestToRemove, setGuestToRemove] = useState<string | null>(null);
+  const [guests, setGuests] = useState<GuestRes[]>([])
+  const [guestName, setGuestName] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+  const [guestToRemove, setGuestToRemove] = useState<GuestRes | null>(null)
 
-  const { theme } = useContext(ThemeContext);
-  const styles = createStyle(theme);
+  const { theme } = useContext(ThemeContext)
+  const styles = createStyle(theme)
 
   useEffect(() => {
     const loadGuests = async () => {
       try {
-        const savedGuests = await AsyncStorage.getItem('@guests');
-        const savedCheckedGuests = await AsyncStorage.getItem('@checkedGuests');
+        const savedGuests = await AsyncStorage.getItem('@guests')
         if (savedGuests) {
-          setGuests(JSON.parse(savedGuests));
-        }
-        if (savedCheckedGuests) {
-          setCheckedGuests(JSON.parse(savedCheckedGuests));
+          setGuests(JSON.parse(savedGuests))
         }
       } catch (error) {
-        console.error('Failed to load guests from storage', error);
+        console.error('Failed to load guests from storage', error)
       }
-    };
+    }
 
-    loadGuests();
-  }, []);
+    loadGuests()
+  }, [])
 
   useEffect(() => {
     const saveGuests = async () => {
       try {
-        await AsyncStorage.setItem('@guests', JSON.stringify(guests));
-        await AsyncStorage.setItem(
-          '@checkedGuests',
-          JSON.stringify(checkedGuests),
-        );
+        await AsyncStorage.setItem('@guests', JSON.stringify(guests))
       } catch (error) {
-        console.error('Failed to save guests to storage', error);
+        console.error('Failed to save guests to storage', error)
       }
-    };
+    }
 
-    saveGuests();
-  }, [guests, checkedGuests]);
+    saveGuests()
+  }, [guests])
 
   const handleGuest = () => {
     if (guestName === '') {
-      return Alert.alert('Sem nome', 'Por favor insira um nome.');
+      return Alert.alert('Sem nome', 'Por favor insira um nome.')
     }
 
-    if (guests.includes(guestName)) {
-      return Alert.alert(
-        'Convidado existe',
-        'O convidado já foi adicionado na lista.',
-      );
+    if (guests.length > 0) {
+      if (guests.some((guest) => guest.name === guestName)) {
+        return Alert.alert(
+          'Convidado existe',
+          'O convidado já foi adicionado na lista.',
+        )
+      }
+
+      const guest = {
+        id: Date.now().toString(),
+        name: guestName,
+        enabled: true,
+      }
+
+      setGuests((prevState) => [...prevState, guest])
+      setGuestName('')
     }
+  }
 
-    setGuests((prevState) => [...prevState, guestName]);
-    setGuestName('');
-  };
+  const handleCheck = (guest: GuestRes) => {
+    setGuests((prevState) =>
+      prevState.map((g) =>
+        g.id === guest.id ? { ...guest, enabled: !guest.enabled } : guest,
+      ),
+    )
+  }
 
-  const handleCheck = (name: string) => {
-    if (checkedGuests.includes(name)) {
-      setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== name),
-      );
-    } else {
-      setCheckedGuests((prevState) => [...prevState, name]);
-    }
-  };
-
-  const confirmDeleteGuest = (name: string) => {
-    setGuestToRemove(name);
-    setModalVisible(true);
-  };
+  const confirmDeleteGuest = (guest: GuestRes) => {
+    setGuestToRemove(guest)
+    setModalVisible(true)
+  }
 
   const handleDeleteGuest = () => {
     if (guestToRemove) {
       setGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove),
-      );
-      setCheckedGuests((prevState) =>
-        prevState.filter((guest) => guest !== guestToRemove),
-      );
+        prevState.filter((guest) => guest.id !== guestToRemove.id),
+      )
     }
-    setModalVisible(false);
-    setGuestToRemove(null);
-  };
+
+    setModalVisible(false)
+    setGuestToRemove(null)
+  }
 
   const handleCancel = () => {
-    setModalVisible(false);
-    setGuestToRemove(null);
-  };
+    setModalVisible(false)
+    setGuestToRemove(null)
+  }
 
   return (
     <View style={styles.container}>
@@ -117,11 +113,10 @@ export const Home = () => {
       <FlatList
         style={styles.list}
         data={guests}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Guests
-            name={item}
-            checkedGuests={checkedGuests}
+            guest={item}
             onCheck={() => handleCheck(item)}
             onRemove={() => confirmDeleteGuest(item)}
           />
@@ -143,7 +138,10 @@ export const Home = () => {
           value={guestName}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleGuest}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleGuest}
+        >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -156,7 +154,7 @@ export const Home = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalText}>
-              Tem certeza que quer remover o convidado {guestToRemove}?
+              Tem certeza que quer remover o convidado {guestToRemove?.name}?
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -176,5 +174,5 @@ export const Home = () => {
         </View>
       </Modal>
     </View>
-  );
-};
+  )
+}

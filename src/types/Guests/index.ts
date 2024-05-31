@@ -1,6 +1,14 @@
-export type GuestProps = {
-  name: String;
-  onRemove: () => void;
-  checkedGuests: String[];
-  onCheck: () => void;
-};
+export interface Guest {
+  name: string
+  enabled: boolean
+}
+
+export interface GuestRes extends Guest {
+  id: string
+}
+
+export interface GuestProps {
+  guest: GuestRes
+  onRemove: () => void
+  onCheck: () => void
+}
