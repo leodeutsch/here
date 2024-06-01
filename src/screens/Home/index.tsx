@@ -11,6 +11,7 @@ import {
 import { createStyle } from './styles'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import uuid from 'react-native-uuid'
 import { Guests } from '../../components/Guests'
 import { ThemeContext } from '../../context/Theme'
 import { GuestRes } from '../../types/Guests'
@@ -63,22 +64,22 @@ export const Home = () => {
           'O convidado já foi adicionado na lista.',
         )
       }
-
-      const guest = {
-        id: Date.now().toString(),
-        name: guestName,
-        enabled: true,
-      }
-
-      setGuests((prevState) => [...prevState, guest])
-      setGuestName('')
     }
+
+    const guest = {
+      id: uuid.v4().toString(),
+      name: guestName,
+      enabled: true,
+    }
+
+    setGuests((prevState) => [...prevState, guest])
+    setGuestName('')
   }
 
-  const handleCheck = (guest: GuestRes) => {
+  const handleCheck = async (guest: GuestRes) => {
     setGuests((prevState) =>
       prevState.map((g) =>
-        g.id === guest.id ? { ...guest, enabled: !guest.enabled } : guest,
+        g.id === guest.id ? { ...g, enabled: !g.enabled } : g,
       ),
     )
   }
