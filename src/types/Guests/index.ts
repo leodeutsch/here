@@ -11,6 +11,4 @@ export type GuestReq = {
 
 export type GuestRes = {
   id: string
-  name: string
-  enabled: boolean
-}
+} & GuestReq
