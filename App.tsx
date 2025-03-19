@@ -1,29 +1,25 @@
-import { useContext } from "react";
-import { StatusBar } from "react-native";
-import { ThemeContext, ThemeProvider } from "./src/context/Theme";
-import { Home } from "./src/screens/Home";
-
-const AppContent = () => {
-  const { theme } = useContext(ThemeContext);
-
-  return (
-    <>
-      <StatusBar
-        barStyle={theme === "dark" ? "light-content" : "dark-content"}
-        backgroundColor="transparent"
-        translucent
-      />
-      <Home />
-    </>
-  );
-};
+import React from 'react'
+import { StatusBar } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { TagProvider } from './src/contexts/TagContext'
+import { TaskProvider } from './src/contexts/TaskContext'
+import { Navigation } from './src/navigation'
+import { COLORS } from './src/styles/theme'
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
-  );
-};
+    <SafeAreaProvider style={{ padding: 5 }}>
+      <TaskProvider>
+        <TagProvider>
+          <StatusBar
+            barStyle="dark-content"
+            backgroundColor={COLORS.BACKGROUND}
+          />
+          <Navigation />
+        </TagProvider>
+      </TaskProvider>
+    </SafeAreaProvider>
+  )
+}
 
-export default App;
+export default App
