@@ -31,13 +31,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
         {task.tags.map((tag, index) => {
           if (index < 3) {
             return (
-              // <Chip
-              //   key={index}
-              //   style={styles.tag}
-              //   mode="flat"
-              // >
-              //   <Text style={styles.tagText}>{tag.name}</Text>
-              // </Chip>
               <ChipComponent
                 key={index}
                 label={tag.name}
