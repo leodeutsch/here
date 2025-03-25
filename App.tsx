@@ -1,29 +1,35 @@
-import { useContext } from "react";
-import { StatusBar } from "react-native";
-import { ThemeContext, ThemeProvider } from "./src/context/Theme";
-import { Home } from "./src/screens/Home";
-
-const AppContent = () => {
-  const { theme } = useContext(ThemeContext);
-
-  return (
-    <>
-      <StatusBar
-        barStyle={theme === "dark" ? "light-content" : "dark-content"}
-        backgroundColor="transparent"
-        translucent
-      />
-      <Home />
-    </>
-  );
-};
+import React from 'react'
+import { StatusBar, StyleSheet } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { TagProvider } from './src/contexts/TagContext'
+import { TaskProvider } from './src/contexts/TaskContext'
+import { Navigation } from './src/navigation'
+import { COLORS } from './src/styles/theme'
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
-  );
-};
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider style={styles.container}>
+        <TaskProvider>
+          <TagProvider>
+            <StatusBar
+              barStyle="dark-content"
+              backgroundColor={COLORS.BACKGROUND}
+            />
+            <Navigation />
+          </TagProvider>
+        </TaskProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  )
+}
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 5
+  }
+})
+
+export default App

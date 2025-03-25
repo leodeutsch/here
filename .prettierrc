@@ -4,6 +4,5 @@
   "bracketSpacing": true,
   "trailingComma": "all",
   "singleAttributePerLine": true,
-  "parser": "typescript",
   "semi": false
 }
