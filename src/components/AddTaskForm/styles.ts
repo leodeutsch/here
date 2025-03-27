@@ -2,16 +2,17 @@ import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
   formContainer: {
-    padding: 16,
+    paddingBlock: 16,
+    paddingInline: 8,
   },
   formTitle: {
     fontSize: 20,
     marginBottom: 16,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
+    width: '100%',
+    borderWidth: 0,
+    // borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,

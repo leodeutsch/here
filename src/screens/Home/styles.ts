@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    marginBottom: -80,
+    marginBottom: -(SCREEN_HEIGHT * 0.1),
     backgroundColor: COLORS.BACKGROUND,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
   },
   bottomSheetHandle: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingTop: 12,
   },
   bottomSheetIndicator: {
     width: 40,

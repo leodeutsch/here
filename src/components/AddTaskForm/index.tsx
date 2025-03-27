@@ -111,16 +111,15 @@ export const AddTaskForm: React.FC<AddTaskFormProps> = ({
 
   return (
     <ScrollView style={styles.formContainer}>
-      <Text style={styles.formTitle}>Add a new task</Text>
       <TextInput
         ref={titleInputRef}
         style={styles.input}
         placeholder="What do you want to do?"
         value={title}
         onChangeText={setTitle}
-        autoFocus={focusOnMount} // Add autoFocus prop as a backup
-        keyboardAppearance="light"
-        returnKeyType="next"
+        autoFocus={focusOnMount}
+        returnKeyType="done"
+        onSubmitEditing={handleSubmit}
       />
       <TextInput
         style={[styles.input, styles.descriptionInput]}
