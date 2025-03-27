@@ -1,41 +1,60 @@
-import React from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import { createStyle } from './styles'
+import { MaterialIcons } from '@expo/vector-icons'
+import React, { useEffect, useState } from 'react'
+import { ScrollView, Text, View } from 'react-native'
+import { getStatistics } from '../../services/statisticsService'
+import { COLORS } from '../../styles/theme'
+import { Statistics } from '../../types'
+import { styles } from './styles'
 
 export const Profile = () => {
-  const styles = createStyle()
+  const [statistics, setStatistics] = useState<Statistics | null>(null)
+
+  useEffect(() => {
+    const loadStatistics = async () => {
+      const stats = await getStatistics()
+      setStatistics(stats)
+    }
+    loadStatistics()
+  }, [])
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image
+          {/* <Image
+            // TODO: use app icon as user avatar
             source={{
               uri: 'https://ui-avatars.com/api/?name=Usuario&background=random',
             }}
             style={styles.avatar}
+          /> */}
+          <MaterialIcons
+            size={56}
+            name="person-pin"
+            color={COLORS.PRIMARY}
           />
         </View>
-        <Text style={styles.name}>Usuário</Text>
-        <Text style={styles.subtitle}>Convidado</Text>
+        <Text style={styles.name}>Snapper</Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Status</Text>
+        <Text style={styles.infoText}>
+          Created tasks: {statistics?.tasksCreated}
+        </Text>
+        <Text style={styles.infoText}>
+          Concluded tasks: {statistics?.tasksCompleted || 0}
+        </Text>
+        <Text style={styles.infoText}>
+          Done rate: {statistics?.completionRate.toFixed(2) || 0}%
+        </Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Sobre o App</Text>
-        <Text style={styles.infoText}>Here - Gerenciador de Convidados</Text>
+        <Text style={styles.infoText}>SnapHabit</Text>
         <Text style={styles.infoText}>Versão 1.0.0</Text>
       </View>
-
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Detalhes do Evento</Text>
-        <Text style={styles.infoText}>Casamento Mércia & Leo</Text>
-        <Text style={styles.infoText}>17 de Agosto de 2024</Text>
-        <Text style={styles.infoText}>Local: A confirmar</Text>
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton}>
-        <Text style={styles.logoutButtonText}>Sair</Text>
-      </TouchableOpacity>
     </ScrollView>
   )
 }

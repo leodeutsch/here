@@ -7,23 +7,26 @@ import { CustomNavBar, TabItem } from '../components/CustomNavBar'
 import { History } from '../screens/History'
 import { HomeScreen } from '../screens/Home'
 import { Profile } from '../screens/Profile'
+import { TagsScreen } from '../screens/Tags'
+import { COLORS } from '../styles/theme'
 // import { TaskDetails } from '../screens/TaskDetails'
 
 const Stack = createNativeStackNavigator()
 
 export const Navigation = () => {
   // Cores da aplicação
-  const primaryColor = '#35716a'
-  const backgroundColor = '#ffffff'
-  const inactiveColor = '#999999'
+  const primaryColor = COLORS.PRIMARY
+  const backgroundColor = COLORS.BACKGROUND
+  const inactiveColor = COLORS.INACTIVE
 
   const [activeTab, setActiveTab] = useState('Tasks')
 
   // Define tabs config
   const tabs: TabItem[] = [
     { name: 'Tasks', icon: 'task-alt' },
-    { name: 'History', icon: 'history' },
-    { name: 'Profile', icon: 'person-outline' },
+    { name: 'Tags', icon: 'tag' },
+    { name: 'Logs', icon: 'pending-actions' },
+    { name: 'Profile', icon: 'person-outline' }, // TODO: check how to make the settings tab
   ]
 
   const handleTabPress = (tabName: string) => {
@@ -35,7 +38,9 @@ export const Navigation = () => {
     switch (activeTab) {
       case 'Tasks':
         return <HomeScreen />
-      case 'History':
+      case 'Tags':
+        return <TagsScreen />
+      case 'Logs':
         return <History />
       case 'Profile':
         return <Profile />

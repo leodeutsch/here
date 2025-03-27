@@ -17,21 +17,9 @@ export const styles = StyleSheet.create({
     marginBottom: 48,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontFamily: FONTS.REGULAR,
     fontWeight: 'bold',
-  },
-  addTaskButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 30,
-    height: 30,
-    borderRadius: '100%',
-    backgroundColor: COLORS.TEXT,
-  },
-  addTaskFont: {
-    color: COLORS.BACKGROUND,
-    fontSize: FONTS.SIZE.LARGE,
   },
   taskItem: {
     padding: 12,
@@ -91,19 +79,17 @@ export const styles = StyleSheet.create({
     backgroundColor: '#DADADA',
     borderRadius: 2,
   },
-  // Keep existing modal styles for reference/compatibility
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 8, // Adjust this value to position the FAB above the CustomNavBar
+    backgroundColor: COLORS.PRIMARY,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  modalContainer: {
-    width: '90%',
-    backgroundColor: COLORS.BACKGROUND,
-    borderRadius: 16,
-    padding: 16,
-    elevation: 5,
+    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,

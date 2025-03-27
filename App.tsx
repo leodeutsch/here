@@ -1,6 +1,7 @@
 import React from 'react'
 import { StatusBar, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { en, registerTranslation } from 'react-native-paper-dates'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { TagProvider } from './src/contexts/TagContext'
 import { TaskProvider } from './src/contexts/TaskContext'
@@ -8,6 +9,7 @@ import { Navigation } from './src/navigation'
 import { COLORS } from './src/styles/theme'
 
 const App = () => {
+  registerTranslation('en', en)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider style={styles.container}>
@@ -28,8 +30,8 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 5
-  }
+    paddingBlock: 5,
+  },
 })
 
 export default App

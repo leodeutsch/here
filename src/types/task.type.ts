@@ -8,5 +8,6 @@ export interface Task {
   description?: string
   reminder?: Reminder[]
   completed: boolean
+  completedAt?: Date
   tags?: Tag[]
 }

@@ -63,7 +63,7 @@ export const CustomNavBar = ({
     const responsiveWidth = minWidth + 40
 
     // Don't let it get too small or too large
-    const minAllowedWidth = Math.min(180, containerWidth * 0.4)
+    const minAllowedWidth = Math.min(200, containerWidth * 0.4)
     const maxAllowedWidth = Math.min(350, containerWidth * 0.8)
 
     return {

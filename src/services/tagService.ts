@@ -20,11 +20,18 @@ export const addTag = async (tag: Tag): Promise<Tag[]> => {
   return newTags
 }
 
+export const updateTag = async (updatedTag: Tag): Promise<Tag[]> => {
+  const tags = await getTags()
+  const newTags = tags.map((tag) =>
+    tag.id === updatedTag.id ? updatedTag : tag,
+  )
+  await AsyncStorage.setItem(TAGS_KEY, JSON.stringify(newTags))
+  return newTags
+}
+
 export const deleteTag = async (id: string): Promise<Tag[]> => {
   const tags = await getTags()
   const newTags = tags.filter((tag) => tag.id !== id)
   await AsyncStorage.setItem(TAGS_KEY, JSON.stringify(newTags))
   return newTags
 }
-
-// Add updateTag similarly if needed

@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    paddingInline: 12,
+    paddingInline: 18,
     paddingVertical: 5,
   },
   tabItem: {
