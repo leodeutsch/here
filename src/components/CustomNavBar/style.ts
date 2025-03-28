@@ -3,16 +3,18 @@ import { FONTS } from '../../styles/theme'
 
 export const styles = StyleSheet.create({
   outerContainer: {
+    position: 'absolute',
+    bottom: 10,
     width: '100%',
     alignItems: 'center',
-    paddingBottom: 10,
+    zIndex: 1,
   },
   container: {
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     height: 60,
     borderRadius: 28,
-    elevation: 8,
+    elevation: 10,
     shadowOpacity: 0.1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

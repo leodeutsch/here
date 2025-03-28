@@ -72,10 +72,20 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
   // Render reminder time on the right
   const renderReminder = () => {
-    if (!task.reminder || task.reminder.length === 0) return null
+    if (
+      !task.reminder ||
+      task.reminder.length === 0 ||
+      task.reminder[0] === undefined ||
+      []
+    )
+      return null
     const now = new Date()
     const reminderDate = new Date(
-      task.reminder[0].when[0].day || task.reminder[0].when[0].toString(),
+      task.reminder[0]?.when?.day?.year,
+      task.reminder[0]?.when?.day?.month,
+      task.reminder[0]?.when?.day?.date,
+      task.reminder[0]?.when?.time?.hours,
+      task.reminder[0]?.when?.time?.minutes,
     ) // Access date property or convert to string
     const diff = reminderDate.getTime() - now.getTime()
     if (diff <= 0) return <Text style={styles.reminderText}>Past due</Text>

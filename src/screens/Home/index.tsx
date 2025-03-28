@@ -4,6 +4,7 @@ import {
   Animated,
   Dimensions,
   Easing,
+  FlatList,
   Keyboard,
   PanResponder,
   Text,
@@ -12,8 +13,10 @@ import {
 } from 'react-native'
 import 'react-native-get-random-values'
 import { AddTaskForm } from '../../components/AddTaskForm'
+import { CalendarSheet } from '../../components/CalendarSheet'
 import { TaskItem } from '../../components/TaskItem'
-import { useTags } from '../../hooks/useTags'
+import { useBottomSheet } from '../../hooks/useBottomSheet'
+import { useTaskForm } from '../../hooks/useTaskForm'
 import { useTasks } from '../../hooks/useTasks'
 import { Task } from '../../types'
 import { styles } from './styles'
@@ -24,12 +27,14 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export const HomeScreen = () => {
   const { tasks, addTask, updateTask, loadTasks } = useTasks()
-  const { tags } = useTags()
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false)
+  const { isVisible, content, showBottomSheet, hideBottomSheet } =
+    useBottomSheet()
+  const { resetCurrentTask } = useTaskForm()
+  const [showFab, setShowFab] = useState(true)
   const translateYAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current
   const backdropOpacity = useRef(new Animated.Value(0)).current
-
   const fabAnimation = useRef(new Animated.Value(0)).current
+
   const fabStyle = {
     transform: [
       {
@@ -74,63 +79,67 @@ export const HomeScreen = () => {
     }),
   ).current
 
-  const showBottomSheet = () => {
-    setIsBottomSheetVisible(true)
+  const showBottomSheetAnimated = () => {
     Animated.parallel([
       Animated.timing(translateYAnim, {
         toValue: 0,
-        duration: DURATION_LONG2,
+        duration: DURATION_LONG2 * 0.4,
         easing: EMPHASIZED_EASING,
         useNativeDriver: true,
       }),
       Animated.timing(backdropOpacity, {
         toValue: 1,
-        duration: DURATION_LONG2 * 0.7,
+        duration: DURATION_LONG2 * 0.6,
         easing: EMPHASIZED_EASING,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      // Wait for animation to complete before attempting to show keyboard
-      setTimeout(() => {
-        // This slight delay ensures the bottom sheet is fully rendered
-        Keyboard.scheduleLayoutAnimation({
-          duration: 100,
-          easing: 'linear',
-          endCoordinates: Keyboard.metrics() || {
-            screenX: 0,
-            screenY: 0,
-            width: 100,
-            height: 100,
-          },
-        })
-      }, 100)
-    })
+    ]).start()
   }
 
-  const hideBottomSheet = () => {
+  const hideBottomSheetAnimated = () => {
     Keyboard.dismiss()
     Animated.parallel([
       Animated.timing(translateYAnim, {
         toValue: SCREEN_HEIGHT,
-        duration: DURATION_LONG2,
+        duration: DURATION_LONG2 * 0.4,
         easing: EMPHASIZED_EASING,
         useNativeDriver: true,
       }),
       Animated.timing(backdropOpacity, {
         toValue: 0,
-        duration: DURATION_LONG2 * 0.7,
+        duration: DURATION_LONG2 * 0.6,
         easing: EMPHASIZED_EASING,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      setIsBottomSheetVisible(false)
+      hideBottomSheet()
     })
   }
 
-  const handleAddTask = (task: Task) => {
-    addTask(task)
-    hideBottomSheet()
+  useEffect(() => {
+    if (isVisible) {
+      showBottomSheetAnimated()
+    } else {
+      hideBottomSheetAnimated()
+    }
+  }, [isVisible, showBottomSheetAnimated, hideBottomSheetAnimated])
+
+  const renderBottomSheetContent = () => {
+    switch (content) {
+      case 'addTask':
+        return <AddTaskForm />
+      case 'calendar':
+        return <CalendarSheet />
+      default:
+        return null
+    }
   }
+
+  // const handleAddTask = (task: Task) => {
+  //   addTask(task)
+  //   hideBottomSheet()
+  //   resetCurrentTask()
+  // }
 
   const handleToggleComplete = useCallback(
     (taskId: string, completed: boolean, completedAt: Date) => {
@@ -170,39 +179,70 @@ export const HomeScreen = () => {
     translateYAnim.setValue(SCREEN_HEIGHT)
   }, [])
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setShowFab(false)
+      },
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setShowFab(true)
+      },
+    )
+
+    return () => {
+      keyboardDidShowListener.remove()
+      keyboardDidHideListener.remove()
+    }
+  }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Tasks</Text>
       </View>
-      {tasks.filter((t: Task) => !t.completed).length === 0 ? (
-        <Text style={styles.emptyText}>No tasks available</Text>
-      ) : (
-        tasks
-          .filter((t: Task) => !t.completed)
-          .map((task: Task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggleComplete={handleToggleComplete}
-            />
-          ))
-      )}
-      <Animated.View style={[styles.fab, fabStyle]}>
-        <TouchableOpacity onPress={showBottomSheet}>
-          <MaterialIcons
-            name="add"
-            size={24}
-            color="white"
-          />
-        </TouchableOpacity>
-      </Animated.View>
 
-      {isBottomSheetVisible && (
+      <FlatList
+        style={styles.list}
+        data={tasks.filter((t: Task) => !t.completed)}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TaskItem
+            task={item}
+            onToggleComplete={handleToggleComplete}
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No tasks available</Text>
+        }
+        contentContainerStyle={{ paddingBottom: 100 }} // Add padding at bottom for FAB
+      />
+
+      {showFab && (
+        <Animated.View style={[styles.fab, fabStyle]}>
+          <TouchableOpacity
+            onPress={() => {
+              resetCurrentTask()
+              showBottomSheet('addTask')
+            }}
+          >
+            <MaterialIcons
+              name="add"
+              size={24}
+              color="white"
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
+      {isVisible && (
         <>
           <Animated.View
             style={[styles.backdrop, { opacity: backdropOpacity }]}
-            onTouchEnd={hideBottomSheet}
+            onTouchEnd={hideBottomSheetAnimated}
           />
           <Animated.View
             style={[
@@ -216,11 +256,7 @@ export const HomeScreen = () => {
               <View style={styles.bottomSheetIndicator} />
             </View>
             <View {...panResponder.panHandlers}>
-              <AddTaskForm
-                onSubmit={handleAddTask}
-                onCancel={hideBottomSheet}
-                focusOnMount={true}
-              />
+              {renderBottomSheetContent()}
             </View>
           </Animated.View>
         </>

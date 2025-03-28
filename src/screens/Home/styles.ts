@@ -6,7 +6,7 @@ const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window')
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingVertical: 16,
     backgroundColor: COLORS.BACKGROUND,
   },
   header: {
@@ -15,11 +15,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 48,
+    paddingHorizontal: 16,
   },
   headerTitle: {
     fontSize: 32,
     fontFamily: FONTS.REGULAR,
     fontWeight: 'bold',
+  },
+  list: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
   taskItem: {
     padding: 12,
@@ -56,18 +61,16 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    marginBottom: -(SCREEN_HEIGHT * 0.1),
+    // height: 100,
     backgroundColor: COLORS.BACKGROUND,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingBottom: 24,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     zIndex: 2,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
-    maxHeight: SCREEN_HEIGHT * 0.85,
   },
   bottomSheetHandle: {
     alignItems: 'center',
@@ -82,14 +85,15 @@ export const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
-    bottom: 8, // Adjust this value to position the FAB above the CustomNavBar
+    bottom: 80,
     backgroundColor: COLORS.PRIMARY,
     width: 56,
     height: 56,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2,
+    elevation: 8,
+    zIndex: 1, // Ensure it stays above other content
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,

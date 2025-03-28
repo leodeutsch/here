@@ -4,7 +4,8 @@ import { COLORS } from '../../styles/theme'
 export const styles = StyleSheet.create({
   container: {
     width: '100%', // Span the full screen width
-    height: '10%',
+    // height: '10%',
+    minHeight: 70,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.BACKGROUND,
