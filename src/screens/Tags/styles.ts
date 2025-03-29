@@ -1,17 +1,17 @@
-import { StyleSheet } from 'react-native'
-import { COLORS } from '../../styles/theme'
+import { MD3Theme } from 'react-native-paper'
+import { createThemedStyles } from '../../util/themedStyle'
 
-export const styles = StyleSheet.create({
+export const tagStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.background,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: COLORS.PRIMARY,
+    color: theme.colors.primary,
   },
   addTagContainer: {
     flexDirection: 'row',
@@ -20,21 +20,21 @@ export const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 40,
-    borderColor: COLORS.PRIMARY,
+    borderColor: theme.colors.primary,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 8,
     marginRight: 8,
   },
   addButton: {
-    backgroundColor: COLORS.PRIMARY,
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 4,
     justifyContent: 'center',
   },
   addButtonText: {
-    color: COLORS.BACKGROUND,
+    color: theme.colors.background,
     fontWeight: 'bold',
   },
   tagList: {
@@ -46,17 +46,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.INACTIVE,
+    borderBottomColor: theme.colors.outline,
   },
   tagName: {
     fontSize: 16,
-    color: COLORS.TEXT,
+    color: theme.colors.onBackground,
   },
   tagActions: {
     flexDirection: 'row',
   },
   editButton: {
-    color: COLORS.PRIMARY,
+    color: theme.colors.primary,
     marginRight: 16,
   },
   deleteButton: {
@@ -65,9 +65,9 @@ export const styles = StyleSheet.create({
   editInput: {
     flex: 1,
     height: 40,
-    borderColor: COLORS.PRIMARY,
+    borderColor: theme.colors.primary,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 8,
   },
-})
+}))

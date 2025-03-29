@@ -1,10 +1,11 @@
-import { StyleSheet } from 'react-native'
-import { COLORS, FONTS } from '../../styles/theme'
+import { MD3Theme } from 'react-native-paper'
+import { FONTS } from '../../styles/theme'
+import { createThemedStyles } from '../../util/themedStyle'
 
-export const styles = StyleSheet.create({
+export const profileStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.background,
     padding: 20,
   },
   header: {
@@ -16,12 +17,12 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     height: 80,
     width: 80,
-    backgroundColor: COLORS.CARD_BG,
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
     borderWidth: 3,
-    borderColor: COLORS.PRIMARY,
+    borderColor: theme.colors.primary,
   },
   avatar: {
     height: 150,
@@ -30,21 +31,21 @@ export const styles = StyleSheet.create({
   name: {
     fontSize: FONTS.SIZE.XLARGE,
     fontFamily: FONTS.BOLD,
-    color: COLORS.TEXT,
+    color: theme.colors.onBackground,
     marginBottom: 5,
   },
   subtitle: {
     fontSize: FONTS.SIZE.MEDIUM,
     fontFamily: FONTS.REGULAR,
-    color: COLORS.SECONDARY_TEXT,
+    color: theme.colors.onSurfaceVariant,
     marginBottom: 10,
   },
   card: {
-    backgroundColor: COLORS.CARD_BG,
+    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -56,7 +57,7 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONTS.SIZE.LARGE,
     fontFamily: FONTS.BOLD,
-    color: COLORS.PRIMARY,
+    color: theme.colors.primary,
     marginBottom: 15,
   },
   settingRow: {
@@ -68,10 +69,10 @@ export const styles = StyleSheet.create({
   settingText: {
     fontSize: FONTS.SIZE.MEDIUM,
     fontFamily: FONTS.REGULAR,
-    color: COLORS.TEXT,
+    color: theme.colors.onBackground,
   },
   logoutButton: {
-    backgroundColor: COLORS.ERROR,
+    backgroundColor: theme.colors.error,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -79,14 +80,14 @@ export const styles = StyleSheet.create({
     marginBottom: 30,
   },
   logoutButtonText: {
-    color: COLORS.BUTTON_TEXT,
+    color: theme.colors.onError,
     fontFamily: FONTS.BOLD,
     fontSize: FONTS.SIZE.MEDIUM,
   },
   infoText: {
     fontSize: FONTS.SIZE.MEDIUM,
     fontFamily: FONTS.REGULAR,
-    color: COLORS.SECONDARY_TEXT,
+    color: theme.colors.onSurfaceVariant,
     marginBottom: 8,
   },
-})
+}))

@@ -1,13 +1,13 @@
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { Checkbox, List, Text } from 'react-native-paper'
 import { useTasks } from '../../hooks/useTasks'
-import { COLORS } from '../../styles/theme'
+import { useTheme } from '../../hooks/useTheme'
 import { Task } from '../../types'
 import { RootStackParamList } from '../../types/'
-import { styles } from './style'
+import { taskItemStyles } from './style'
 
 interface TaskItemProps {
   task: Task
@@ -21,6 +21,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   task,
   onToggleComplete,
 }) => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => taskItemStyles(theme), [theme])
   const [isCompleted, setIsCompleted] = useState(task.completed)
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -64,8 +66,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <Checkbox
         status={isCompleted ? 'checked' : 'unchecked'}
         onPress={handleToggleComplete}
-        color={COLORS.PRIMARY}
-        uncheckedColor={COLORS.PRIMARY}
+        color={theme.colors.primary}
+        uncheckedColor={theme.colors.outline}
       />
     </View>
   )
@@ -116,12 +118,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         title={task.title}
         titleStyle={[styles.title, isCompleted && styles.completedTitle]}
         description={task.description}
-        descriptionStyle={isCompleted && styles.completedDescription}
+        descriptionStyle={[
+          isCompleted && styles.completedDescription,
+          {
+            color: isCompleted
+              ? theme.colors.outline
+              : theme.colors.onSurfaceVariant,
+          },
+        ]}
         descriptionNumberOfLines={1}
         left={() => (
           <List.Icon
-            icon={task.icon || 'checkbox-blank-circle-outline'}
-            color={COLORS.PRIMARY}
+            icon={'equal'}
+            color={theme.colors.primary}
           />
         )}
         right={renderRightContent}

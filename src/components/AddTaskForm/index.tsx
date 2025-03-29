@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -12,8 +12,9 @@ import { v4 as uuid } from 'uuid'
 import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTaskForm } from '../../hooks/useTaskForm'
 import { useTasks } from '../../hooks/useTasks'
+import { useTheme } from '../../hooks/useTheme'
 import { Task } from '../../types'
-import { styles } from './styles'
+import { addTaskFormStyles } from './styles'
 
 const initialTaskState: Task = {
   id: '',
@@ -23,6 +24,8 @@ const initialTaskState: Task = {
 }
 
 export const AddTaskForm: React.FC = () => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => addTaskFormStyles(theme), [theme])
   const { currentTask, updateCurrentTask } = useTaskForm()
   const { showBottomSheet, hideBottomSheet } = useBottomSheet()
   const { addTask } = useTasks()
@@ -89,7 +92,7 @@ export const AddTaskForm: React.FC = () => {
             <MaterialIcons
               name="calendar-month"
               size={24}
-              color="#000"
+              color={theme.colors.onSurface}
             />
           </TouchableOpacity>
         </View>

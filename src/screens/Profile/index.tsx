@@ -1,12 +1,15 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
+import { useTheme } from '../../hooks/useTheme'
 import { getStatistics } from '../../services/statisticsService'
-import { COLORS } from '../../styles/theme'
 import { Statistics } from '../../types'
-import { styles } from './styles'
+import { profileStyles } from './styles'
 
 export const Profile = () => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => profileStyles(theme), [theme])
+
   const [statistics, setStatistics] = useState<Statistics | null>(null)
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export const Profile = () => {
           <MaterialIcons
             size={56}
             name="person-pin"
-            color={COLORS.PRIMARY}
+            color={theme.colors.primary}
           />
         </View>
         <Text style={styles.name}>Snapper</Text>

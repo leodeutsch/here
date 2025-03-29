@@ -1,16 +1,17 @@
-import { Dimensions, StyleSheet } from 'react-native'
-import { COLORS, FONTS } from '../../styles/theme'
+import { Dimensions } from 'react-native'
+import { MD3Theme } from 'react-native-paper'
+import { FONTS } from '../../styles/theme'
+import { createThemedStyles } from '../../util/themedStyle'
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window')
 
-export const styles = StyleSheet.create({
+export const calendarSheetStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     height: SCREEN_HEIGHT * 0.7,
     paddingHorizontal: 8,
-    // paddingBottom: 20,
   },
   sheetHeader: {
     flexDirection: 'row',
@@ -23,6 +24,8 @@ export const styles = StyleSheet.create({
     padding: 8,
   },
   calendar: {
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.onSurface,
     marginBottom: 16,
   },
   timePickerContainer: {
@@ -35,12 +38,12 @@ export const styles = StyleSheet.create({
   timePickerLabel: {
     fontSize: 16,
     fontFamily: FONTS.REGULAR,
-    color: COLORS.TEXT,
+    color: theme.colors.onSurface,
   },
   timePickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.CARD_BG,
+    backgroundColor: theme.colors.surfaceVariant,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -48,7 +51,7 @@ export const styles = StyleSheet.create({
   timePickerButtonText: {
     fontSize: 16,
     fontFamily: FONTS.REGULAR,
-    color: COLORS.TEXT,
+    color: theme.colors.onSurface,
     marginRight: 8,
   },
-})
+}))

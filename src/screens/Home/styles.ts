@@ -1,13 +1,15 @@
-import { Dimensions, StyleSheet } from 'react-native'
-import { COLORS, FONTS } from '../../styles/theme'
+import { Dimensions } from 'react-native'
+import { MD3Theme } from 'react-native-paper'
+import { FONTS } from '../../styles/theme'
+import { createThemedStyles } from '../../util/themedStyle'
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window')
 
-export const styles = StyleSheet.create({
+export const homeStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
     paddingVertical: 16,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.background,
   },
   header: {
     display: 'flex',
@@ -21,6 +23,7 @@ export const styles = StyleSheet.create({
     fontSize: 32,
     fontFamily: FONTS.REGULAR,
     fontWeight: 'bold',
+    color: theme.colors.onBackground,
   },
   list: {
     paddingVertical: 8,
@@ -44,7 +47,7 @@ export const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     marginVertical: 20,
-    color: '#999',
+    color: theme.colors.outline,
   },
   // New styles for bottom sheet
   backdrop: {
@@ -53,7 +56,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(254, 254, 254, 0.5)',
+    backgroundColor: theme.colors.backdrop,
     zIndex: 1,
   },
   bottomSheet: {
@@ -62,12 +65,12 @@ export const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     // height: 100,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     zIndex: 2,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
@@ -79,14 +82,14 @@ export const styles = StyleSheet.create({
   bottomSheetIndicator: {
     width: 40,
     height: 4,
-    backgroundColor: '#DADADA',
+    backgroundColor: theme.colors.outlineVariant,
     borderRadius: 2,
   },
   fab: {
     position: 'absolute',
     right: 16,
     bottom: 80,
-    backgroundColor: COLORS.PRIMARY,
+    backgroundColor: theme.colors.primary,
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -94,9 +97,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 8,
     zIndex: 1, // Ensure it stays above other content
-    shadowColor: '#000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-})
+}))

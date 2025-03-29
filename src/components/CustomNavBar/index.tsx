@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Animated,
   LayoutAnimation,
@@ -9,7 +9,8 @@ import {
   UIManager,
   View,
 } from 'react-native'
-import { styles } from './style'
+import { useTheme } from '../../hooks/useTheme'
+import { navBarStyles } from './style'
 
 // Enable LayoutAnimation for Android
 if (
@@ -39,9 +40,14 @@ export const CustomNavBar = ({
   primaryColor,
   inactiveColor,
 }: CustomNavBarProps) => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => navBarStyles(theme), [theme])
   // State to store tab measurements
   const [tabWidths, setTabWidths] = useState<{ [key: string]: number }>({})
   const [containerWidth, setContainerWidth] = useState<number | null>(null)
+
+  const themeActiveColor = theme.colors.primary
+  const themeInactiveColor = theme.colors.outline
 
   // Calculate the minimum responsive width based on tab content
   const getNavBarWidth = () => {
@@ -97,7 +103,7 @@ export const CustomNavBar = ({
 
   const renderTabItem = (tab: TabItem, index: number) => {
     const isActive = activeTab === tab.name
-    const color = isActive ? primaryColor : inactiveColor
+    const color = isActive ? themeActiveColor : themeInactiveColor
 
     // Animation values
     const animatedWidth = useRef(new Animated.Value(isActive ? 1 : 0)).current
@@ -124,7 +130,10 @@ export const CustomNavBar = ({
         key={tab.name}
         style={styles.tabItem}
         onPress={() => onTabPress(tab.name)}
-        android_ripple={{ color: '#eee', borderless: true }}
+        android_ripple={{
+          color: theme.colors.surfaceVariant,
+          borderless: true,
+        }}
       >
         <MaterialIcons
           name={tab.icon}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Alert,
   FlatList,
@@ -9,11 +9,14 @@ import {
 } from 'react-native'
 import { v4 as uuid } from 'uuid'
 import { useTags } from '../../hooks/useTags'
+import { useTheme } from '../../hooks/useTheme'
 import { Tag } from '../../types'
-import { styles } from './styles'
+import { tagStyles } from './styles'
 
 export const TagsScreen = () => {
   const { tags, addTag, updateTag, deleteTag } = useTags()
+  const { theme } = useTheme()
+  const styles = useMemo(() => tagStyles(theme), [theme])
   const [newTagName, setNewTagName] = useState('')
   const [editingTag, setEditingTag] = useState<Tag | null>(null)
 
@@ -80,6 +83,7 @@ export const TagsScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="New tag name"
+          placeholderTextColor={theme.colors.onBackground}
           value={newTagName}
           onChangeText={setNewTagName}
         />

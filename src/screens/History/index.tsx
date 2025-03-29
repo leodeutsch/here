@@ -1,18 +1,20 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { useTasks } from '../../hooks/useTasks'
+import { useTheme } from '../../hooks/useTheme'
 import { Task } from '../../types'
-import { styles } from './styles'
+import { logStyles } from './styles'
 
 export const History = () => {
   const { tasks, loadTasks, deleteTask } = useTasks()
+  const { theme } = useTheme()
+  const styles = useMemo(() => logStyles(theme), [theme])
 
-  const completedTasks = tasks
-    .filter((t) => t.completed)
-    .sort(
-      (a, b) =>
-        (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0),
-    )
+  const completedTasks = tasks.filter((t) => t.completed)
+  // .sort(
+  //   (a, b) =>
+  //     (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0),
+  // )
 
   const handleLongPress = async (task: Task) => {
     try {
@@ -30,7 +32,8 @@ export const History = () => {
     >
       <Text style={styles.taskTitle}>{item.title}</Text>
       <Text style={styles.taskDate}>
-        Completed on: {item.completedAt?.toLocaleString()}
+        {/* Completed on: {item.completedAt?.toLocaleString()} */}
+        Completed on: today
       </Text>
     </TouchableOpacity>
   )

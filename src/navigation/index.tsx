@@ -1,23 +1,27 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { View } from 'react-native'
 
+import { MD3Theme } from 'react-native-paper'
 import { CustomNavBar, TabItem } from '../components/CustomNavBar'
+import { useTheme } from '../hooks/useTheme'
 import { History } from '../screens/History'
 import { HomeScreen } from '../screens/Home'
 import { Profile } from '../screens/Profile'
 import { TagsScreen } from '../screens/Tags'
-import { COLORS } from '../styles/theme'
+import { createThemedStyles } from '../util/themedStyle'
 // import { TaskDetails } from '../screens/TaskDetails'
 
 const Stack = createNativeStackNavigator()
 
 export const Navigation = () => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => navStyles(theme), [theme])
   // Cores da aplicação
-  const primaryColor = COLORS.PRIMARY
-  const backgroundColor = COLORS.BACKGROUND
-  const inactiveColor = COLORS.INACTIVE
+  const primaryColor = theme.colors.primary
+  const backgroundColor = theme.colors.background
+  const inactiveColor = theme.colors.outline
 
   const [activeTab, setActiveTab] = useState('Tasks')
 
@@ -54,7 +58,7 @@ export const Navigation = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#ffffff' },
+          contentStyle: { backgroundColor: backgroundColor },
           animation: 'fade',
         }}
       >
@@ -94,13 +98,13 @@ export const Navigation = () => {
   )
 }
 
-const styles = StyleSheet.create({
+const navStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.background,
   },
   screenContainer: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.background,
   },
-})
+}))

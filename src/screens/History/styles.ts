@@ -1,20 +1,19 @@
-import { StyleSheet } from 'react-native'
-import { COLORS } from '../../styles/theme'
+import { MD3Theme } from 'react-native-paper'
+import { createThemedStyles } from '../../util/themedStyle'
 
-export const styles = StyleSheet.create({
+export const logStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: COLORS.BACKGROUND,
+    backgroundColor: theme.colors.background,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: COLORS.TEXT,
+    color: theme.colors.onBackground,
   },
   taskItem: {
-    // backgroundColor: COLORS.CARD_BG,
     padding: 16,
     marginBottom: 8,
     borderRadius: 8,
@@ -22,16 +21,16 @@ export const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: COLORS.TEXT,
+    color: theme.colors.onBackground,
   },
   taskDate: {
     fontSize: 14,
-    color: COLORS.INACTIVE,
+    color: theme.colors.outlineVariant,
     marginTop: 4,
   },
   emptyText: {
     fontSize: 16,
-    color: COLORS.INACTIVE,
+    color: theme.colors.outlineVariant,
     textAlign: 'center',
   },
-})
+}))

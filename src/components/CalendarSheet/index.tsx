@@ -1,15 +1,17 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Platform, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar, DateData } from 'react-native-calendars'
 import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTaskForm } from '../../hooks/useTaskForm'
-import { COLORS } from '../../styles/theme'
+import { useTheme } from '../../hooks/useTheme'
 import { DateType } from '../../types'
-import { styles } from './styles'
+import { calendarSheetStyles } from './styles'
 
 export const CalendarSheet: React.FC = () => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => calendarSheetStyles(theme), [theme])
   const { currentTask, updateCurrentTask } = useTaskForm()
   const { hideBottomSheet, showBottomSheet } = useBottomSheet()
   const [showTimePicker, setShowTimePicker] = useState(false)
@@ -68,7 +70,7 @@ export const CalendarSheet: React.FC = () => {
           <MaterialIcons
             name="close"
             size={24}
-            color={COLORS.INACTIVE}
+            color={theme.colors.onSurface}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -78,7 +80,7 @@ export const CalendarSheet: React.FC = () => {
           <MaterialIcons
             name="check"
             size={24}
-            color={COLORS.PRIMARY}
+            color={theme.colors.primary}
           />
         </TouchableOpacity>
       </View>
@@ -97,14 +99,18 @@ export const CalendarSheet: React.FC = () => {
           <MaterialIcons
             name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
             size={24}
-            color={COLORS.PRIMARY}
+            color={theme.colors.primary}
           />
         )}
         theme={{
-          todayTextColor: COLORS.PRIMARY,
-          selectedDayBackgroundColor: COLORS.PRIMARY,
-          textDisabledColor: COLORS.BACKGROUND,
-          arrowColor: COLORS.PRIMARY,
+          backgroundColor: theme.colors.surface,
+          calendarBackground: theme.colors.surface,
+          textSectionTitleColor: theme.colors.primary,
+          selectedDayTextColor: theme.colors.primary,
+          todayTextColor: theme.colors.primary,
+          selectedDayBackgroundColor: theme.colors.primary,
+          textDisabledColor: theme.colors.surface,
+          arrowColor: theme.colors.primary,
         }}
         style={styles.calendar}
       />
@@ -132,7 +138,7 @@ export const CalendarSheet: React.FC = () => {
           <MaterialIcons
             name="access-time"
             size={24}
-            color={COLORS.PRIMARY}
+            color={theme.colors.primary}
           />
         </TouchableOpacity>
       </View>

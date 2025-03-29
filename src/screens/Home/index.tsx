@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Animated,
   Dimensions,
@@ -18,14 +18,17 @@ import { TaskItem } from '../../components/TaskItem'
 import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTaskForm } from '../../hooks/useTaskForm'
 import { useTasks } from '../../hooks/useTasks'
+import { useTheme } from '../../hooks/useTheme'
 import { Task } from '../../types'
-import { styles } from './styles'
+import { homeStyles } from './styles'
 
 const EMPHASIZED_EASING = Easing.bezier(0.2, 0, 0, 1)
 const DURATION_LONG2 = 400
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export const HomeScreen = () => {
+  const { theme } = useTheme()
+  const styles = useMemo(() => homeStyles(theme), [theme])
   const { tasks, addTask, updateTask, loadTasks } = useTasks()
   const { isVisible, content, showBottomSheet, hideBottomSheet } =
     useBottomSheet()
@@ -232,7 +235,7 @@ export const HomeScreen = () => {
             <MaterialIcons
               name="add"
               size={24}
-              color="white"
+              color={theme.colors.onPrimary}
             />
           </TouchableOpacity>
         </Animated.View>
