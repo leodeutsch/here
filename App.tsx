@@ -9,6 +9,7 @@ import { TagProvider } from './src/contexts/TagContext'
 import { TaskProvider } from './src/contexts/TaskContext'
 import { TaskFormProvider } from './src/contexts/TaskFormContext'
 import { ThemeContext, ThemeProvider } from './src/contexts/ThemeContext'
+import { useTheme } from './src/hooks/useTheme'
 import { Navigation } from './src/navigation'
 
 if (Platform.OS === 'android') {
@@ -20,17 +21,26 @@ if (Platform.OS === 'android') {
 }
 
 const App = () => {
+  const { theme } = useTheme()
   registerTranslation('en', en)
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+    >
       <ThemeProvider>
         <ThemeContext.Consumer>
           {({ theme }) => (
             <PaperProvider theme={theme}>
-              <SafeAreaProvider style={styles.container}>
+              <SafeAreaProvider
+                style={[
+                  styles.container,
+                  { backgroundColor: theme.colors.background },
+                ]}
+              >
                 <StatusBar
                   barStyle={theme.dark ? 'light-content' : 'dark-content'}
                   backgroundColor={theme.colors.background}
+                  translucent
                 />
                 <BottomSheetProvider>
                   <TaskProvider>
@@ -53,7 +63,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
 })
 

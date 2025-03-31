@@ -54,6 +54,15 @@ export const profileStyles = createThemedStyles((theme: MD3Theme) => ({
     shadowRadius: 4,
     elevation: 3,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  resetButton: {
+    padding: 5,
+  },
   sectionTitle: {
     fontSize: FONTS.SIZE.LARGE,
     fontFamily: FONTS.BOLD,

@@ -1,8 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import React, { useEffect, useMemo, useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { useTheme } from '../../hooks/useTheme'
-import { getStatistics } from '../../services/statisticsService'
+import {
+  getStatistics,
+  resetStatistics,
+} from '../../services/statisticsService'
 import { Statistics } from '../../types'
 import { profileStyles } from './styles'
 
@@ -12,25 +15,40 @@ export const Profile = () => {
 
   const [statistics, setStatistics] = useState<Statistics | null>(null)
 
+  const loadStatistics = async () => {
+    const stats = await getStatistics()
+    setStatistics(stats)
+  }
+
   useEffect(() => {
-    const loadStatistics = async () => {
-      const stats = await getStatistics()
-      setStatistics(stats)
-    }
     loadStatistics()
   }, [])
+
+  const handleResetStatistics = () => {
+    Alert.alert(
+      'Reset Statistics',
+      'Are you sure you want to reset all statistics? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Reset',
+          onPress: async () => {
+            await resetStatistics()
+            loadStatistics()
+          },
+          style: 'destructive',
+        },
+      ],
+    )
+  }
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          {/* <Image
-            // TODO: use app icon as user avatar
-            source={{
-              uri: 'https://ui-avatars.com/api/?name=Usuario&background=random',
-            }}
-            style={styles.avatar}
-          /> */}
           <MaterialIcons
             size={56}
             name="person-pin"
@@ -41,7 +59,19 @@ export const Profile = () => {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Status</Text>
+        <View style={styles.cardHeader}>
+          <Text style={styles.sectionTitle}>Status</Text>
+          <TouchableOpacity
+            onPress={handleResetStatistics}
+            style={styles.resetButton}
+          >
+            <MaterialIcons
+              name="loop"
+              size={24}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.infoText}>
           Created tasks: {statistics?.tasksCreated}
         </Text>

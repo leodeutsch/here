@@ -1,31 +1,47 @@
-import { FC, useMemo } from 'react'
-import { View } from 'react-native'
-import { MD3Theme, Text } from 'react-native-paper'
+import { MaterialIcons } from '@expo/vector-icons'
+import { useMemo } from 'react'
+import { TouchableOpacity } from 'react-native'
+import { Text } from 'react-native-paper'
 import { useTheme } from '../../hooks/useTheme'
-import { createThemedStyles } from '../../util/themedStyle'
+import { Tag } from '../../types'
+import { chipStyles } from './styles'
 
-export const ChipComponent: FC<{ label: string }> = ({ label }) => {
+export const Chip: React.FC<{
+  tag: Tag
+  onDelete: () => void
+  onPress: () => void
+  disabled?: boolean
+  isDeletable?: boolean
+  addStyle?: any
+}> = ({ tag, onDelete, onPress, disabled, isDeletable = true, addStyle }) => {
   const { theme } = useTheme()
-  const styles = useMemo(() => chipStyle(theme), [theme])
+  const styles = useMemo(() => chipStyles(theme), [theme])
+
   return (
-    <View style={styles.customTag}>
-      <Text style={styles.customTagText}>{label}</Text>
-    </View>
+    <TouchableOpacity
+      style={[styles.tagChip, addStyle && addStyle]}
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.7}
+    >
+      <Text style={styles.tagChipText}>{tag.name}</Text>
+      {isDeletable && (
+        <TouchableOpacity
+          style={styles.tagChipDelete}
+          onPress={(e) => {
+            e.stopPropagation()
+            onDelete()
+          }}
+          disabled={disabled}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <MaterialIcons
+            name="close"
+            size={18}
+            color={theme.colors.onSurface}
+          />
+        </TouchableOpacity>
+      )}
+    </TouchableOpacity>
   )
 }
-
-const chipStyle = createThemedStyles((theme: MD3Theme) => ({
-  customTag: {
-    height: 24, // Fully customizable height
-    backgroundColor: theme.colors.backdrop,
-    borderRadius: 12, // Pill shape
-    paddingVertical: 2, // Exact padding you want
-    paddingHorizontal: 8, // Exact padding you want
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  customTagText: {
-    fontSize: 11, // Exact text size
-    color: theme.colors.onBackground,
-  },
-}))

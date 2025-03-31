@@ -1,5 +1,12 @@
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInYears,
+  format,
+} from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { Checkbox, List, Text } from 'react-native-paper'
@@ -14,7 +21,7 @@ interface TaskItemProps {
   onToggleComplete: (
     taskId: string,
     completed: boolean,
-    completedAt: Date,
+    completedAt: string,
   ) => void
 }
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -24,12 +31,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const { theme } = useTheme()
   const styles = useMemo(() => taskItemStyles(theme), [theme])
   const [isCompleted, setIsCompleted] = useState(task.completed)
+  const [isCompletedPending, setIsCompletedPending] = useState(false)
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { loadTasks, deleteTask } = useTasks()
 
-  // Handle click to navigate to full-screen card
   const handlePress = () => {
     navigation.navigate('TaskDetails', { taskId: task.id })
   }
@@ -37,28 +44,42 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const handleToggleComplete = () => {
     const newCompletedState = !isCompleted
     setIsCompleted(newCompletedState)
-    onToggleComplete(task.id, newCompletedState, new Date())
+
+    if (newCompletedState) {
+      setIsCompletedPending(true)
+      setTimeout(() => {
+        setIsCompletedPending(false)
+        onToggleComplete(task.id, newCompletedState, new Date().toISOString())
+      }, 3000)
+    } else {
+      setIsCompletedPending(false)
+      onToggleComplete(task.id, newCompletedState, new Date().toISOString())
+    }
   }
 
-  // Render tags as small pills under the title
-  // const renderTags = () => {
-  //   if (!task.tags || task.tags.length === 0) return null
-  //   return (
-  //     <View style={styles.tagsContainer}>
-  //       {task.tags.map((tag, index) => {
-  //         if (index < 3) {
-  //           return (
-  //             <ChipComponent
-  //               key={index}
-  //               label={tag.name}
-  //             />
-  //           )
-  //         }
-  //         return null
-  //       })}
-  //     </View>
-  //   )
-  // }
+  const renderTags = () => {
+    if (!task.tags || task.tags.length === 0) return null
+    return (
+      <View style={styles.tagsContainer}>
+        {task.tags.map((tag, index) => {
+          if (index < 3) {
+            return (
+              <Text
+                style={[
+                  styles.reminderText,
+                  { marginRight: 8, fontStyle: 'italic' },
+                ]}
+                key={tag.id}
+              >
+                {`${tag.name}`}
+              </Text>
+            )
+          }
+          return null
+        })}
+      </View>
+    )
+  }
 
   const renderRightContent = () => (
     <View style={styles.rightContent}>
@@ -72,35 +93,68 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     </View>
   )
 
-  // Render reminder time on the right
   const renderReminder = () => {
-    if (
-      !task.reminder ||
-      task.reminder.length === 0 ||
-      task.reminder[0] === undefined ||
-      []
-    )
-      return null
+    if (!task.scheduledAt) return null
+
     const now = new Date()
-    const reminderDate = new Date(
-      task.reminder[0]?.when?.day?.year,
-      task.reminder[0]?.when?.day?.month,
-      task.reminder[0]?.when?.day?.date,
-      task.reminder[0]?.when?.time?.hours,
-      task.reminder[0]?.when?.time?.minutes,
-    ) // Access date property or convert to string
-    const diff = reminderDate.getTime() - now.getTime()
-    if (diff <= 0) return <Text style={styles.reminderText}>Past due</Text>
-    const hours = Math.floor(diff / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    return <Text style={styles.reminderText}>{`in ${hours}h ${minutes}m`}</Text>
+    const reminderDate = new Date(task.scheduledAt)
+    const diffMinutes = differenceInMinutes(reminderDate, now)
+    const diffHours = differenceInHours(reminderDate, now)
+    const diffDays = differenceInDays(reminderDate, now)
+    const diffYears = differenceInYears(reminderDate, now)
+
+    if (diffMinutes < 0)
+      return <Text style={styles.reminderText}>Past due</Text>
+
+    if (diffMinutes < 60) {
+      return (
+        <Text
+          style={styles.reminderText}
+        >{`in ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`}</Text>
+      )
+    }
+
+    if (diffHours < 24) {
+      const remainingMinutes = diffMinutes % 60
+      return (
+        <Text
+          style={styles.reminderText}
+        >{`in ${diffHours}h ${remainingMinutes}m`}</Text>
+      )
+    }
+
+    if (diffDays < 7) {
+      if (diffDays === 0) return <Text style={styles.reminderText}>Today</Text>
+      if (diffDays === 1)
+        return <Text style={styles.reminderText}>Tomorrow</Text>
+      return <Text style={styles.reminderText}>{`in ${diffDays} days`}</Text>
+    }
+
+    if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7)
+      return (
+        <Text
+          style={styles.reminderText}
+        >{`in ${weeks} week${weeks !== 1 ? 's' : ''}`}</Text>
+      )
+    }
+
+    if (diffYears < 1) {
+      return (
+        <Text style={styles.reminderText}>{format(reminderDate, 'MMM d')}</Text>
+      )
+    }
+
+    return (
+      <Text style={styles.reminderText}>
+        {format(reminderDate, 'MMM d, yyyy')}
+      </Text>
+    )
   }
 
   const handleLongPress = async () => {
     try {
       await deleteTask(task.id)
-      // You might want to add some feedback here like a toast notification
-      // Or refresh the task list after deletion
       loadTasks()
     } catch (error) {
       console.error('Error deleting task:', error)
@@ -112,20 +166,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     <TouchableOpacity
       onPress={handlePress}
       onLongPress={handleLongPress}
-      style={styles.container}
+      style={[styles.container, isCompletedPending && { opacity: 0.7 }]}
     >
       <List.Item
         title={task.title}
-        titleStyle={[styles.title, isCompleted && styles.completedTitle]}
-        description={task.description}
-        descriptionStyle={[
-          isCompleted && styles.completedDescription,
-          {
-            color: isCompleted
-              ? theme.colors.outline
-              : theme.colors.onSurfaceVariant,
-          },
+        titleStyle={[
+          styles.title,
+          (isCompleted || isCompletedPending) && styles.completedTitle,
         ]}
+        description={renderTags}
         descriptionNumberOfLines={1}
         left={() => (
           <List.Icon

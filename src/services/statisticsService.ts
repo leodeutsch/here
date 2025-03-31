@@ -47,3 +47,16 @@ export const incrementTasksDeleted = () =>
     ...stats,
     tasksDeleted: stats.tasksDeleted + 1,
   }))
+
+export const resetStatistics = async () => {
+  await AsyncStorage.removeItem(STATISTICS_KEY)
+  await AsyncStorage.setItem(
+    STATISTICS_KEY,
+    JSON.stringify({
+      tasksCreated: 0,
+      tasksCompleted: 0,
+      tasksDeleted: 0,
+      completionRate: 0,
+    }),
+  )
+}

@@ -6,7 +6,6 @@ import {
   Easing,
   FlatList,
   Keyboard,
-  PanResponder,
   Text,
   TouchableOpacity,
   View,
@@ -14,6 +13,7 @@ import {
 import 'react-native-get-random-values'
 import { AddTaskForm } from '../../components/AddTaskForm'
 import { CalendarSheet } from '../../components/CalendarSheet'
+import { TagSuggestionsModal } from '../../components/TagSuggestionsModal'
 import { TaskItem } from '../../components/TaskItem'
 import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTaskForm } from '../../hooks/useTaskForm'
@@ -49,38 +49,6 @@ export const HomeScreen = () => {
     ],
     opacity: fabAnimation,
   }
-
-  // Define how far user needs to drag to dismiss
-  const DISMISS_THRESHOLD = 100
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (gestureState: any) => {
-        // Only respond to vertical gestures
-        return Math.abs(gestureState.dx) < Math.abs(gestureState.dy)
-      },
-      onPanResponderMove: (gestureState: any) => {
-        // Only allow dragging down, not up
-        if (gestureState.dy > 0) {
-          translateYAnim.setValue(gestureState.dy)
-        }
-      },
-      onPanResponderRelease: (gestureState: any) => {
-        if (gestureState.dy > DISMISS_THRESHOLD) {
-          // User dragged down enough to dismiss
-          hideBottomSheet()
-        } else {
-          // Reset position
-          Animated.spring(translateYAnim, {
-            toValue: 0,
-            useNativeDriver: true,
-            friction: 8,
-          }).start()
-        }
-      },
-    }),
-  ).current
 
   const showBottomSheetAnimated = () => {
     Animated.parallel([
@@ -133,19 +101,15 @@ export const HomeScreen = () => {
         return <AddTaskForm />
       case 'calendar':
         return <CalendarSheet />
+      case 'tagSuggestions':
+        return <TagSuggestionsModal />
       default:
         return null
     }
   }
 
-  // const handleAddTask = (task: Task) => {
-  //   addTask(task)
-  //   hideBottomSheet()
-  //   resetCurrentTask()
-  // }
-
   const handleToggleComplete = useCallback(
-    (taskId: string, completed: boolean, completedAt: Date) => {
+    (taskId: string, completed: boolean, completedAt: string) => {
       const task = tasks.find((t: Task) => t.id === taskId)
       if (task) {
         const updatedTask = {
@@ -255,12 +219,7 @@ export const HomeScreen = () => {
               },
             ]}
           >
-            <View style={styles.bottomSheetHandle}>
-              <View style={styles.bottomSheetIndicator} />
-            </View>
-            <View {...panResponder.panHandlers}>
-              {renderBottomSheetContent()}
-            </View>
+            {renderBottomSheetContent()}
           </Animated.View>
         </>
       )}

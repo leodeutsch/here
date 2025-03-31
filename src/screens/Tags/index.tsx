@@ -1,105 +1,239 @@
-import React, { useMemo, useState } from 'react'
+import { MaterialIcons } from '@expo/vector-icons'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
+  Animated,
+  Dimensions,
+  Easing,
   FlatList,
+  Keyboard,
+  ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
-import { v4 as uuid } from 'uuid'
+import { Chip } from '../../components/Chip'
+import { TagSheet } from '../../components/TagSheet'
+import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTags } from '../../hooks/useTags'
 import { useTheme } from '../../hooks/useTheme'
 import { Tag } from '../../types'
 import { tagStyles } from './styles'
 
+const EMPHASIZED_EASING = Easing.bezier(0.2, 0, 0, 1)
+const DURATION_LONG2 = 400
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
+
 export const TagsScreen = () => {
+  const { isVisible, content, data, showBottomSheet, hideBottomSheet } =
+    useBottomSheet()
   const { tags, addTag, updateTag, deleteTag } = useTags()
   const { theme } = useTheme()
   const styles = useMemo(() => tagStyles(theme), [theme])
-  const [newTagName, setNewTagName] = useState('')
-  const [editingTag, setEditingTag] = useState<Tag | null>(null)
-
-  const handleAddTag = () => {
-    if (newTagName.trim()) {
-      const newTag: Tag = {
-        id: uuid(),
-        name: newTagName.trim(),
-      }
-      addTag(newTag)
-      setNewTagName('')
-    }
-  }
-
-  const handleUpdateTag = () => {
-    if (editingTag && editingTag.name.trim()) {
-      updateTag(editingTag)
-      setEditingTag(null)
-    }
-  }
+  const [isListView, setIsListView] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const listViewAnim = useRef(new Animated.Value(0)).current
+  const translateYAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current
+  const backdropOpacity = useRef(new Animated.Value(0)).current
 
   const handleDeleteTag = (tag: Tag) => {
     Alert.alert(
       'Delete Tag',
       `Are you sure you want to delete "${tag.name}"?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'default' },
         {
           text: 'Delete',
-          style: 'destructive',
+          style: 'cancel',
           onPress: () => deleteTag(tag.id),
         },
       ],
     )
   }
 
+  const chipViewStyle = {
+    opacity: listViewAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0],
+    }),
+  }
+
+  const listViewStyle = {
+    opacity: listViewAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+    }),
+  }
+
+  const showBottomSheetAnimated = () => {
+    Animated.parallel([
+      Animated.timing(translateYAnim, {
+        toValue: 0,
+        duration: DURATION_LONG2 * 0.4,
+        easing: EMPHASIZED_EASING,
+        useNativeDriver: true,
+      }),
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: DURATION_LONG2 * 0.6,
+        easing: EMPHASIZED_EASING,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }
+
+  const hideBottomSheetAnimated = () => {
+    Animated.parallel([
+      Animated.timing(translateYAnim, {
+        toValue: SCREEN_HEIGHT,
+        duration: DURATION_LONG2 * 0.4,
+        easing: EMPHASIZED_EASING,
+        useNativeDriver: true,
+      }),
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: DURATION_LONG2 * 0.6,
+        easing: EMPHASIZED_EASING,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      hideBottomSheet()
+    })
+    Keyboard.dismiss()
+  }
+
+  const animateViewChange = (toListView: boolean) => {
+    if (isAnimating) return
+
+    setIsAnimating(true)
+    Animated.timing(listViewAnim, {
+      toValue: toListView ? 1 : 0,
+      duration: 200,
+      useNativeDriver: false,
+      easing: Easing.inOut(Easing.ease),
+    }).start(() => {
+      setIsListView(toListView)
+      setIsAnimating(false)
+    })
+  }
+
+  useEffect(() => {
+    if (isVisible) {
+      showBottomSheetAnimated()
+    } else {
+      hideBottomSheetAnimated()
+    }
+  }, [isVisible])
+
+  const renderBottomSheetContent = () => {
+    switch (content) {
+      case 'tag':
+        return <TagSheet />
+      default:
+        return null
+    }
+  }
+
   const renderTagItem = ({ item }: { item: Tag }) => (
     <View style={styles.tagItem}>
-      {editingTag && editingTag.id === item.id ? (
-        <TextInput
-          style={styles.editInput}
-          value={editingTag.name}
-          onChangeText={(text) => setEditingTag({ ...editingTag, name: text })}
-          onBlur={handleUpdateTag}
-        />
-      ) : (
-        <Text style={styles.tagName}>{item.name}</Text>
-      )}
+      <Text style={styles.tagName}>{item.name}</Text>
       <View style={styles.tagActions}>
-        <TouchableOpacity onPress={() => setEditingTag(item)}>
-          <Text style={styles.editButton}>Edit</Text>
+        <TouchableOpacity onPress={() => showBottomSheet('tag', { tag: item })}>
+          <MaterialIcons
+            name="edit"
+            size={18}
+            color={theme.colors.primary}
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDeleteTag(item)}>
-          <Text style={styles.deleteButton}>Delete</Text>
+        <TouchableOpacity
+          style={{ marginLeft: 24 }}
+          onPress={() => handleDeleteTag(item)}
+        >
+          <MaterialIcons
+            name="delete"
+            size={18}
+            color={theme.colors.error}
+          />
         </TouchableOpacity>
       </View>
     </View>
   )
 
+  const renderTagChips = () => (
+    <ScrollView contentContainerStyle={styles.tagChipsContainer}>
+      {tags.map((tag) => (
+        <Chip
+          key={tag.id}
+          tag={tag}
+          onDelete={() => !isAnimating && handleDeleteTag(tag)}
+          onPress={() => !isAnimating && showBottomSheet('tag', { tag })}
+        />
+      ))}
+      <TouchableOpacity
+        style={styles.addTagChip}
+        onPress={() => !isAnimating && showBottomSheet('tag')}
+        disabled={isAnimating}
+      >
+        <Text style={styles.addTagChipText}>Add Tag</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  )
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Manage Tags</Text>
-      <View style={styles.addTagContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="New tag name"
-          placeholderTextColor={theme.colors.onBackground}
-          value={newTagName}
-          onChangeText={setNewTagName}
-        />
+      <View style={styles.header}>
+        <Text style={styles.title}>Manage Tags</Text>
         <TouchableOpacity
-          style={styles.addButton}
-          onPress={handleAddTag}
+          onPress={() => animateViewChange(!isListView)}
+          disabled={isAnimating}
         >
-          <Text style={styles.addButtonText}>Add</Text>
+          <MaterialIcons
+            name={isListView ? 'grid-view' : 'list'}
+            size={24}
+            color={theme.colors.onBackground}
+          />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={tags}
-        renderItem={renderTagItem}
-        keyExtractor={(item) => item.id}
-        style={styles.tagList}
-      />
+      <View style={styles.viewContainer}>
+        {/* First view - Chip View */}
+        <Animated.View
+          style={[styles.chipViewContainer, chipViewStyle]}
+          pointerEvents={isListView ? 'none' : 'auto'}
+        >
+          {renderTagChips()}
+        </Animated.View>
+
+        <Animated.View
+          style={[styles.listViewContainer, listViewStyle]}
+          pointerEvents={isListView ? 'auto' : 'none'}
+        >
+          <FlatList
+            data={tags}
+            renderItem={renderTagItem}
+            keyExtractor={(item) => item.id}
+            style={styles.tagList}
+          />
+        </Animated.View>
+      </View>
+      {isVisible && content === 'tag' && (
+        <>
+          <Animated.View
+            style={[styles.backdrop, { opacity: backdropOpacity }]}
+            onTouchEnd={hideBottomSheetAnimated}
+          />
+          <Animated.View
+            style={[
+              styles.bottomSheet,
+              {
+                transform: [{ translateY: translateYAnim }],
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {renderBottomSheetContent()}
+          </Animated.View>
+        </>
+      )}
     </View>
   )
 }

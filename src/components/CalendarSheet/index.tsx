@@ -1,13 +1,12 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import DateTimePicker from '@react-native-community/datetimepicker'
 import React, { useMemo, useState } from 'react'
-import { Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import { Calendar, DateData } from 'react-native-calendars'
+import { TimePickerModal } from 'react-native-paper-dates'
 import { useBottomSheet } from '../../hooks/useBottomSheet'
 import { useTaskForm } from '../../hooks/useTaskForm'
 import { useTheme } from '../../hooks/useTheme'
-import { DateType } from '../../types'
-import { calendarSheetStyles } from './styles'
+import { calendarSheetStyles, calendarTheme } from './styles'
 
 export const CalendarSheet: React.FC = () => {
   const { theme } = useTheme()
@@ -15,48 +14,58 @@ export const CalendarSheet: React.FC = () => {
   const { currentTask, updateCurrentTask } = useTaskForm()
   const { hideBottomSheet, showBottomSheet } = useBottomSheet()
   const [showTimePicker, setShowTimePicker] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    currentTask.scheduledAt || null,
+  )
+
+  const selectedDateObj = selectedDate ? new Date(selectedDate) : new Date()
 
   const handleDateSelect = (date: DateData) => {
-    const day = {
-      year: date.year,
-      month: date.month,
-      date: date.day,
-    }
+    const newDate = selectedDate ? new Date(selectedDate) : new Date()
+    newDate.setFullYear(date.year)
+    newDate.setMonth(date.month - 1)
+    newDate.setDate(date.day)
 
-    updateCurrentTask({
-      when: {
-        day: day,
-      },
-    })
+    setSelectedDate(newDate.toISOString())
   }
 
-  const handleTimeChange = (event: any, selectedTime?: Date) => {
+  const onConfirmTime = ({
+    hours,
+    minutes,
+  }: {
+    hours: number
+    minutes: number
+  }) => {
+    const newDate = selectedDate ? new Date(selectedDate) : new Date()
+    newDate.setHours(hours)
+    newDate.setMinutes(minutes)
+
+    setSelectedDate(newDate.toISOString())
     setShowTimePicker(false)
-    const currentDate = selectedTime || new Date()
-    setShowTimePicker(Platform.OS === 'ios')
-
-    const time = {
-      hours: selectedTime?.getHours() || 0,
-      minutes: selectedTime?.getMinutes() || 0,
-    }
-
-    updateCurrentTask({
-      when: {
-        time,
-      },
-    })
   }
 
-  const toMarkedDates = (customDate?: DateType): { [key: string]: any } => {
-    if (!customDate) return {}
-    const { year, month, date } = customDate
-    const dateString = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`
+  const toMarkedDates = () => {
+    if (!selectedDate) return {}
+
+    const date = new Date(selectedDate)
+    const dateString = date.toISOString().split('T')[0] // YYYY-MM-DD
+
     return {
-      [dateString]: { selected: true, marked: true, selectedColor: 'blue' },
+      [dateString]: {
+        selected: true,
+        marked: false,
+        selectedColor: theme.colors.primary,
+      },
     }
   }
 
   const handleSave = () => {
+    updateCurrentTask({
+      ...currentTask,
+      scheduledAt: selectedDate ?? undefined,
+    })
+
+    // Go back to the task form
     showBottomSheet('addTask')
   }
 
@@ -89,12 +98,7 @@ export const CalendarSheet: React.FC = () => {
         disableAllTouchEventsForDisabledDays={true}
         current={new Date().toISOString().split('T')[0]}
         onDayPress={handleDateSelect}
-        markedDates={{
-          [toMarkedDates(currentTask.when?.day) && '']: {
-            selected: true,
-            marked: true,
-          },
-        }}
+        markedDates={toMarkedDates()}
         renderArrow={(direction: any) => (
           <MaterialIcons
             name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
@@ -102,16 +106,7 @@ export const CalendarSheet: React.FC = () => {
             color={theme.colors.primary}
           />
         )}
-        theme={{
-          backgroundColor: theme.colors.surface,
-          calendarBackground: theme.colors.surface,
-          textSectionTitleColor: theme.colors.primary,
-          selectedDayTextColor: theme.colors.primary,
-          todayTextColor: theme.colors.primary,
-          selectedDayBackgroundColor: theme.colors.primary,
-          textDisabledColor: theme.colors.surface,
-          arrowColor: theme.colors.primary,
-        }}
+        theme={calendarTheme(theme)}
         style={styles.calendar}
       />
 
@@ -122,14 +117,8 @@ export const CalendarSheet: React.FC = () => {
           style={styles.timePickerButton}
         >
           <Text style={styles.timePickerButtonText}>
-            {currentTask.when?.time
-              ? new Date(
-                  0,
-                  0,
-                  0,
-                  currentTask.when.time.hours,
-                  currentTask.when.time.minutes,
-                ).toLocaleTimeString([], {
+            {selectedDate
+              ? selectedDateObj.toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
@@ -144,22 +133,13 @@ export const CalendarSheet: React.FC = () => {
       </View>
 
       {showTimePicker && (
-        <DateTimePicker
-          value={
-            currentTask.reminder?.[0]?.when
-              ? new Date(
-                  currentTask.reminder[0].when.day.year,
-                  currentTask.reminder[0].when.day.month,
-                  currentTask.reminder[0].when.day.date,
-                  currentTask.reminder[0].when.time.hours,
-                  currentTask.reminder[0].when.time.minutes,
-                )
-              : new Date()
-          }
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={handleTimeChange}
+        <TimePickerModal
+          visible={showTimePicker}
+          onDismiss={() => setShowTimePicker(false)}
+          onConfirm={onConfirmTime}
+          hours={selectedDateObj.getHours()}
+          minutes={selectedDateObj.getMinutes()}
+          use24HourClock={false}
         />
       )}
     </View>

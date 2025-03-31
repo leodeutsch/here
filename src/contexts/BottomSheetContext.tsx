@@ -1,11 +1,22 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useCallback, useState } from 'react'
+import { Tag } from '../types'
 
-type BottomSheetContent = 'addTask' | 'calendar' | null
+type BottomSheetContent =
+  | 'addTask'
+  | 'calendar'
+  | 'tag'
+  | 'tagSuggestions'
+  | null
+
+interface BottomSheetData {
+  tag?: Tag
+}
 
 interface BottomSheetContextType {
   isVisible: boolean
   content: BottomSheetContent
-  showBottomSheet: (content: BottomSheetContent) => void
+  data: BottomSheetData | null
+  showBottomSheet: (content: BottomSheetContent, data?: BottomSheetData) => void
   hideBottomSheet: () => void
 }
 
@@ -18,24 +29,30 @@ export const BottomSheetProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [content, setContent] = useState<BottomSheetContent>(null)
+  const [data, setData] = useState<BottomSheetData | null>(null)
 
-  const showBottomSheet = (newContent: BottomSheetContent) => {
-    setContent(newContent)
-    setIsVisible(true)
-  }
+  const showBottomSheet = useCallback(
+    (newContent: BottomSheetContent, newData?: BottomSheetData) => {
+      setContent(newContent)
+      setData(newData || null)
+      setIsVisible(true)
+    },
+    [],
+  )
 
   const hideBottomSheet = () => {
-    if (content === 'calendar') {
+    if (content === 'calendar' || content === 'tagSuggestions') {
       setContent('addTask')
     } else {
       setIsVisible(false)
       setContent(null)
+      setData(null)
     }
   }
 
   return (
     <BottomSheetContext.Provider
-      value={{ isVisible, content, showBottomSheet, hideBottomSheet }}
+      value={{ isVisible, content, data, showBottomSheet, hideBottomSheet }}
     >
       {children}
     </BottomSheetContext.Provider>

@@ -38,7 +38,7 @@ export const light = {
   },
   surfaceDisabled: 'rgba(27, 27, 31, 0.12)',
   onSurfaceDisabled: 'rgba(27, 27, 31, 0.38)',
-  backdrop: 'rgba(48, 48, 56, 0.4)',
+  backdrop: 'rgba(255, 251, 255, 0.1)',
 }
 
 export const dark = {
@@ -81,5 +81,5 @@ export const dark = {
   },
   surfaceDisabled: 'rgba(229, 225, 230, 0.12)',
   onSurfaceDisabled: 'rgba(229, 225, 230, 0.38)',
-  backdrop: 'rgba(48, 48, 56, 0.4)',
+  backdrop: 'rgba(27, 27, 31, 0.1)',
 }

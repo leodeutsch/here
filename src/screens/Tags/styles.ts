@@ -1,41 +1,68 @@
+import { Dimensions, Platform, StyleSheet } from 'react-native'
 import { MD3Theme } from 'react-native-paper'
+import { FONTS } from '../../styles/theme'
 import { createThemedStyles } from '../../util/themedStyle'
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export const tagStyles = createThemedStyles((theme: MD3Theme) => ({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: theme.colors.background,
+    paddingVertical: 16,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 48,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 24,
+    fontFamily: FONTS.REGULAR,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: theme.colors.primary,
+    color: theme.colors.onBackground,
   },
-  addTagContainer: {
+  tagChipsContainer: {
     flexDirection: 'row',
-    marginBottom: 16,
+    flexWrap: 'wrap',
   },
-  input: {
-    flex: 1,
-    height: 40,
-    borderColor: theme.colors.primary,
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
+  tagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: 24,
+    paddingVertical: 4,
+    paddingLeft: 14,
+    paddingRight: 8,
     marginRight: 8,
+    marginBottom: 8,
   },
-  addButton: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 16,
+  tagChipText: {
+    color: theme.colors.onSecondaryContainer,
+    marginRight: 4,
+  },
+  tagChipDelete: {
+    padding: 2,
+  },
+  addTagChip: {
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.outline,
+    borderWidth: 1,
+    borderStyle: Platform.OS === 'android' ? 'dashed' : 'dotted',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 24,
     paddingVertical: 8,
-    borderRadius: 4,
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
   },
-  addButtonText: {
-    color: theme.colors.background,
-    fontWeight: 'bold',
+  addTagChipText: {
+    color: theme.colors.outline,
   },
   tagList: {
     flex: 1,
@@ -44,9 +71,9 @@ export const tagStyles = createThemedStyles((theme: MD3Theme) => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.outline,
+    paddingVertical: 12,
+    borderBottomWidth: 0.4,
+    borderBottomColor: theme.colors.outlineVariant,
   },
   tagName: {
     fontSize: 16,
@@ -60,14 +87,52 @@ export const tagStyles = createThemedStyles((theme: MD3Theme) => ({
     marginRight: 16,
   },
   deleteButton: {
-    color: 'red',
+    color: theme.colors.error,
   },
-  editInput: {
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: theme.colors.backdrop,
+    zIndex: 3,
+  },
+  bottomSheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16,
+    zIndex: 4,
+    elevation: 8,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  viewContainer: {
     flex: 1,
-    height: 40,
-    borderColor: theme.colors.primary,
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingVertical: 8,
+  },
+  chipViewContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '96%',
+    paddingHorizontal: 16,
+  },
+  listViewContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    paddingHorizontal: 16,
   },
 }))

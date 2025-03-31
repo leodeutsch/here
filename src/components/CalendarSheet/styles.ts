@@ -55,3 +55,23 @@ export const calendarSheetStyles = createThemedStyles((theme: MD3Theme) => ({
     marginRight: 8,
   },
 }))
+
+// In styles.ts
+export const calendarTheme = (theme: MD3Theme) => ({
+  calendarBackground: theme.colors.surface,
+  textSectionTitleColor: theme.colors.primary,
+  selectedDayTextColor: theme.colors.onPrimary,
+  todayTextColor: theme.colors.primary,
+  dayTextColor: theme.colors.onSurface,
+  textDisabledColor: theme.colors.surface,
+  selectedDayBackgroundColor: theme.colors.primary,
+  arrowColor: theme.colors.primary,
+  monthTextColor: theme.colors.primary,
+  indicatorColor: theme.colors.primary,
+  textDayFontFamily: theme.fonts.bodyMedium.fontFamily,
+  textMonthFontFamily: theme.fonts.bodyLarge.fontFamily,
+  textDayHeaderFontFamily: theme.fonts.bodyMedium.fontFamily,
+  textDayFontSize: 16,
+  textMonthFontSize: 18,
+  textDayHeaderFontSize: 14,
+})

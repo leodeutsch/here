@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import React, { useMemo } from 'react'
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { useTasks } from '../../hooks/useTasks'
@@ -11,11 +12,8 @@ export const History = () => {
   const styles = useMemo(() => logStyles(theme), [theme])
 
   const completedTasks = tasks.filter((t) => t.completed)
-  // .sort(
-  //   (a, b) =>
-  //     (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0),
-  // )
 
+  // TODO: check a better way to handle this
   const handleLongPress = async (task: Task) => {
     try {
       await deleteTask(task.id)
@@ -25,6 +23,16 @@ export const History = () => {
     }
   }
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+
   const renderItem = ({ item }: { item: Task }) => (
     <TouchableOpacity
       style={styles.taskItem}
@@ -32,15 +40,23 @@ export const History = () => {
     >
       <Text style={styles.taskTitle}>{item.title}</Text>
       <Text style={styles.taskDate}>
-        {/* Completed on: {item.completedAt?.toLocaleString()} */}
-        Completed on: today
+        {`Completed on: ${formatDate(item.completedAt)}` || 'Completed'}
       </Text>
     </TouchableOpacity>
   )
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Log</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Log</Text>
+        <TouchableOpacity onPress={loadTasks}>
+          <MaterialIcons
+            name="loop"
+            size={24}
+            color={theme.colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
       {completedTasks.length === 0 ? (
         <Text style={styles.emptyText}>No completed tasks</Text>
       ) : (

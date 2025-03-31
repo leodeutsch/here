@@ -1,4 +1,5 @@
 import { MD3Theme } from 'react-native-paper'
+import { FONTS } from '../../styles/theme'
 import { createThemedStyles } from '../../util/themedStyle'
 
 export const logStyles = createThemedStyles((theme: MD3Theme) => ({
@@ -8,9 +9,18 @@ export const logStyles = createThemedStyles((theme: MD3Theme) => ({
     backgroundColor: theme.colors.background,
   },
   header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 48,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
     fontSize: 24,
+    fontFamily: FONTS.REGULAR,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: theme.colors.onBackground,
   },
   taskItem: {

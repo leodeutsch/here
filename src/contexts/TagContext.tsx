@@ -1,10 +1,11 @@
 import React, { createContext, useEffect, useState } from 'react'
+import { v4 as uuid } from 'uuid'
 import { addTag, deleteTag, getTags, updateTag } from '../services/tagService'
 import { Tag } from '../types'
 
 interface TagContextType {
   tags: Tag[]
-  addTag: (tag: Tag) => void
+  addTag: (tagName: string) => void
   updateTag: (tag: Tag) => void
   deleteTag: (id: string) => void
 }
@@ -29,7 +30,11 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({
     loadTags()
   }, [])
 
-  const handleAddTag = async (tag: Tag) => {
+  const handleAddTag = async (tagName: string) => {
+    const tag: Tag = {
+      id: uuid(),
+      name: tagName,
+    }
     const newTags = await addTag(tag)
     setTags(newTags)
   }
